@@ -51,13 +51,13 @@ AI：（完全按照你的规范来写）
 
 ### 为什么需要 ai-kb？
 
-| 问题 | 没有 ai-kb | 有 ai-kb |
-|-----|-----------|---------|
-| 规范解释 | 每次都要重复说 | AI 读一次就记住 |
-| 代码风格 | 每次都要纠正 | 一次写对 |
-| 新人上手 | 要花时间培训 | AI 自动知道规范 |
-| 团队统一 | 全靠自觉 | AI 自动统一 |
-| 经验传承 | 口口相传 | 喂给 AI，持续传承 |
+| 问题     | 没有 ai-kb     | 有 ai-kb          |
+| -------- | -------------- | ----------------- |
+| 规范解释 | 每次都要重复说 | AI 读一次就记住   |
+| 代码风格 | 每次都要纠正   | 一次写对          |
+| 新人上手 | 要花时间培训   | AI 自动知道规范   |
+| 团队统一 | 全靠自觉       | AI 自动统一       |
+| 经验传承 | 口口相传       | 喂给 AI，持续传承 |
 
 ### 效率对比
 
@@ -87,7 +87,6 @@ AI：（完全按照你的规范来写）
 ```
 project/
 ├── package.json          ← 需手动运行 setup-ai
-├── setup.sh              ← 手动备用方案
 ├── README.md             ← 说明文档
 ├── .ai-kb -> ~/          ← 软链接（运行 setup-ai 后生成）
 └── src/
@@ -111,37 +110,38 @@ project/
 在 `scripts/setup-ai-kb.js` 中添加以下代码：
 
 ```javascript
-const { execSync } = require('child_process');
-const fs = require('fs');
-const path = require('path');
+const { execSync } = require("child_process");
+const fs = require("fs");
+const path = require("path");
 
 const { HOME } = process.env || {};
 const AI_KB_SOURCE = `${HOME}/.ai-kb`;
-const PROJECT_ROOT = path.join(__dirname, '..');
-const PROJECT_AI_KB = path.join(PROJECT_ROOT, '.ai-kb');
-const GIT_REPO = 'https://github.com/your-team/project.git'; // 项目git地址
+const PROJECT_ROOT = path.join(__dirname, "..");
+const PROJECT_AI_KB = path.join(PROJECT_ROOT, ".ai-kb");
+const GIT_REPO = "https://github.com/your-team/project.git"; // 项目git地址
 
-console.log('🔧 ai-kb 设置中...\n');
+console.log("🔧 ai-kb 设置中...\n");
 
 // 1. 检查 chezmoi 是否存在
 let chezmoiExists = false;
 try {
-  chezmoiExists = execSync('which chezmoi', { encoding: 'utf-8' }).trim().length > 0;
+  chezmoiExists =
+    execSync("which chezmoi", { encoding: "utf-8" }).trim().length > 0;
 } catch {
   chezmoiExists = false;
 }
 
 if (!chezmoiExists) {
-  console.log('📦 chezmoi 未安装，正在安装...');
+  console.log("📦 chezmoi 未安装，正在安装...");
   try {
-    execSync('brew install chezmoi', { stdio: 'inherit' });
+    execSync("brew install chezmoi", { stdio: "inherit" });
   } catch {
-    console.error('❌ chezmoi 安装失败，请手动安装');
-    console.log('   安装命令: brew install chezmoi');
+    console.error("❌ chezmoi 安装失败，请手动安装");
+    console.log("   安装命令: brew install chezmoi");
     process.exit(1);
   }
 }
-console.log('✅ chezmoi 已安装');
+console.log("✅ chezmoi 已安装");
 
 // 辅助函数：递归复制文件
 function copyRecursiveSync(src, dest) {
@@ -157,27 +157,27 @@ function copyRecursiveSync(src, dest) {
 }
 
 // 2. 检查/初始化 ai-kb
-const chezmoiRoot = path.join(process.env.HOME, '.local', 'share', 'chezmoi');
+const chezmoiRoot = path.join(process.env.HOME, ".local", "share", "chezmoi");
 if (!fs.existsSync(AI_KB_SOURCE)) {
-  console.log('📥 正在初始化 ai-kb...');
+  console.log("📥 正在初始化 ai-kb...");
   try {
-    execSync(`chezmoi init ${GIT_REPO}`, { stdio: 'inherit' });
+    execSync(`chezmoi init ${GIT_REPO}`, { stdio: "inherit" });
   } catch {
-    console.error('❌ chezmoi init 失败');
+    console.error("❌ chezmoi init 失败");
     process.exit(1);
   }
 }
 
 // 同步 chezmoi 仓库内容到 ai-kb
-console.log('🔄 正在同步知识库内容...');
+console.log("🔄 正在同步知识库内容...");
 try {
-  execSync('chezmoi apply', { stdio: 'inherit' });
+  execSync("chezmoi apply", { stdio: "inherit" });
 
   // 创建目标目录
   fs.mkdirSync(AI_KB_SOURCE, { recursive: true });
 
   // 复制 chezmoi 仓库中的所有内容（排除 .git）
-  const ignoreDirs = ['.git'];
+  const ignoreDirs = [".git"];
   const chezmoiItems = fs.readdirSync(chezmoiRoot);
   for (const item of chezmoiItems) {
     if (ignoreDirs.includes(item)) continue;
@@ -186,25 +186,26 @@ try {
     copyRecursiveSync(src, dest);
   }
 } catch {
-  console.error('❌ 同步失败');
+  console.error("❌ 同步失败");
   process.exit(1);
 }
-console.log('✅ ai-kb 已就绪');
+console.log("✅ ai-kb 已就绪");
 
 // 3. 创建软链接
 const projectSymlinkExists = fs.existsSync(PROJECT_AI_KB);
-const projectIsSymlink = projectSymlinkExists && fs.lstatSync(PROJECT_AI_KB).isSymbolicLink();
+const projectIsSymlink =
+  projectSymlinkExists && fs.lstatSync(PROJECT_AI_KB).isSymbolicLink();
 
 if (projectIsSymlink) {
-  console.log('✅ 软链接已存在');
+  console.log("✅ 软链接已存在");
 } else if (!projectSymlinkExists) {
   fs.symlinkSync(AI_KB_SOURCE, PROJECT_AI_KB);
   console.log(`🔗 软链接已创建: .ai-kb → ${AI_KB_SOURCE}`);
 } else {
-  console.log('⚠️  已存在同名目录，请手动删除 .ai-kb 后重试');
+  console.log("⚠️  已存在同名目录，请手动删除 .ai-kb 后重试");
 }
 
-console.log('\n🎉 ai-kb 设置完成！');
+console.log("\n🎉 ai-kb 设置完成！");
 ```
 
 ### 手动备用方案
@@ -245,6 +246,7 @@ ls -la .ai-kb
 ```
 
 setup-ai 命令会完成：
+
 - 检查/安装 chezmoi
 - 检查/初始化 ai-kb
 - 创建软链接 `.ai-kb`
@@ -311,28 +313,28 @@ ai-kb/
 
 ### core - 核心文件
 
-| 文件 | 说明 |
-|-----|------|
-| `core/prompts/base.md` | 通用开发基础规范（必读） |
-| `core/prompts/review.md` | 代码审查检查清单 |
-| `core/templates/page.md` | 页面开发通用模板 |
-| `core/templates/hook.md` | 自定义 Hook 模板 |
+| 文件                     | 说明                     |
+| ------------------------ | ------------------------ |
+| `core/prompts/base.md`   | 通用开发基础规范（必读） |
+| `core/prompts/review.md` | 代码审查检查清单         |
+| `core/templates/page.md` | 页面开发通用模板         |
+| `core/templates/hook.md` | 自定义 Hook 模板         |
 
 ### domains - 按领域分类
 
-| 领域 | 说明 | 主要文件 |
-|-----|------|---------|
+| 领域       | 说明     | 主要文件                        |
+| ---------- | -------- | ------------------------------- |
 | `frontend` | 前端开发 | `react-antd.md`, `component.md` |
-| `backend` | 后端开发 | `nodejs.md`, `api.md` |
-| `pm` | 产品需求 | `prd.md` |
-| `office` | 办公文档 | `ppt.md` |
+| `backend`  | 后端开发 | `nodejs.md`, `api.md`           |
+| `pm`       | 产品需求 | `prd.md`                        |
+| `office`   | 办公文档 | `ppt.md`                        |
 
 ### shared - 共享资源
 
-| 目录 | 说明 |
-|-----|------|
+| 目录               | 说明                         |
+| ------------------ | ---------------------------- |
 | `shared/snippets/` | 常用代码片段（Git、Bash 等） |
-| `shared/guides/` | 操作指南和排查文档 |
+| `shared/guides/`   | 操作指南和排查文档           |
 
 ---
 
@@ -348,6 +350,7 @@ ai-kb/
 请先阅读 `.ai-kb/core/prompts/base.md` 了解通用开发规范。
 
 ## 项目特定规则
+
 - API 基础地址: http://localhost:8080
 - 使用 TypeScript
 - 页面文件放在 src/pages/
@@ -365,14 +368,14 @@ ai-kb/
 
 ## 使用场景
 
-| 场景 | 让 AI 读取 | AI 获得的能力 |
-|-----|-----------|--------------|
+| 场景          | 让 AI 读取                               | AI 获得的能力              |
+| ------------- | ---------------------------------------- | -------------------------- |
 | 写 React 组件 | `domains/frontend/prompts/react-antd.md` | 函数式组件 + Hooks + Antd5 |
-| 写后端 API | `domains/backend/prompts/nodejs.md` | Express/Koa + async/await |
-| 写需求文档 | `domains/pm/prompts/prd.md` | PRD 模板结构 |
-| 做技术分享 | `domains/office/prompts/ppt.md` | PPT 大纲模板 |
-| 代码审查 | `core/prompts/review.md` | 检查清单 |
-| 遇到问题 | `shared/guides/troubleshooting.md` | 常见问题解决方案 |
+| 写后端 API    | `domains/backend/prompts/nodejs.md`      | Express/Koa + async/await  |
+| 写需求文档    | `domains/pm/prompts/prd.md`              | PRD 模板结构               |
+| 做技术分享    | `domains/office/prompts/ppt.md`          | PPT 大纲模板               |
+| 代码审查      | `core/prompts/review.md`                 | 检查清单                   |
+| 遇到问题      | `shared/guides/troubleshooting.md`       | 常见问题解决方案           |
 
 ---
 
@@ -391,6 +394,7 @@ ai-kb/
 ## 高效提问技巧
 
 推荐模板：
+
 ```
 【背景】
 我正在开发一个 React + Antd5 后台管理系统...
@@ -419,6 +423,7 @@ ai-kb/
 ### Q1: 运行 npm install 后没有设置 ai-kb
 
 ai-kb 不会在安装依赖时自动设置，如需使用请手动运行：
+
 ```bash
 npm run setup-ai
 ```
@@ -480,6 +485,7 @@ chezmoi apply
 ### Q6: AI 没有读取 ai-kb 内容
 
 在对话开始时告诉 AI：
+
 ```markdown
 请先阅读 .ai-kb/core/prompts/base.md 了解开发规范后再开始。
 ```
@@ -487,11 +493,13 @@ chezmoi apply
 ### Q7: Windows 上软链接创建失败
 
 以管理员身份运行命令提示符：
+
 ```cmd
 mklink /D "C:\path\to\project\.ai-kb" "C:\Users\用户名\.ai-kb"
 ```
 
 或使用 Git Bash：
+
 ```bash
 ln -s /c/Users/你的用户名/.ai-kb /c/path/to/project/.ai-kb
 ```
@@ -538,12 +546,12 @@ chezmoi apply
 
 ### 团队协作规范
 
-| 操作 | 负责人 | 说明 |
-|-----|-------|------|
+| 操作         | 负责人     | 说明                             |
+| ------------ | ---------- | -------------------------------- |
 | 更新基础规范 | 技术负责人 | 确保 core/prompts/base.md 为最新 |
-| 更新前端规范 | 前端负责人 | 确保 domains/frontend/ 为最新 |
-| 更新后端规范 | 后端负责人 | 确保 domains/backend/ 为最新 |
-| 添加模板 | 相关负责人 | 按规范添加到对应目录 |
+| 更新前端规范 | 前端负责人 | 确保 domains/frontend/ 为最新    |
+| 更新后端规范 | 后端负责人 | 确保 domains/backend/ 为最新     |
+| 添加模板     | 相关负责人 | 按规范添加到对应目录             |
 
 ---
 
@@ -588,24 +596,24 @@ chezmoi apply
 
 ### 快捷命令速查
 
-| 命令 | 说明 |
-|-----|------|
-| `chezmoi status` | 查看改动 |
-| `chezmoi diff` | 查看详细改动 |
-| `chezmoi apply` | 应用改动 |
-| `chezmoi update` | 拉取最新 |
+| 命令                          | 说明           |
+| ----------------------------- | -------------- |
+| `chezmoi status`              | 查看改动       |
+| `chezmoi diff`                | 查看详细改动   |
+| `chezmoi apply`               | 应用改动       |
+| `chezmoi update`              | 拉取最新       |
 | `chezmoi add ~/.ai-kb/新文件` | 添加新文件管理 |
-| `chezmoi edit ~/.ai-kb/文件` | 编辑文件 |
-| `chezmoi sync` | 同步到 GitHub |
+| `chezmoi edit ~/.ai-kb/文件`  | 编辑文件       |
+| `chezmoi sync`                | 同步到 GitHub  |
 
 ### 文件路径速查
 
-| 路径 | 说明 |
-|-----|------|
-| `~/.ai-kb/` | ai-kb 根目录 |
+| 路径                      | 说明             |
+| ------------------------- | ---------------- |
+| `~/.ai-kb/`               | ai-kb 根目录     |
 | `~/.local/share/chezmoi/` | chezmoi 内部存储 |
-| `.ai-kb/` | 项目中的软链接 |
-| `CLAUDE.md` | 项目中的 AI 配置 |
+| `.ai-kb/`                 | 项目中的软链接   |
+| `CLAUDE.md`               | 项目中的 AI 配置 |
 
 ### 相关资源
 
