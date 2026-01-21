@@ -86,10 +86,10 @@ AI：（完全按照你的规范来写）
 
 ```
 project/
-├── package.json          ← postinstall 自动触发
+├── package.json          ← 需手动运行 setup-ai
 ├── setup.sh              ← 手动备用方案
 ├── README.md             ← 说明文档
-├── .ai-kb -> ~/          ← 软链接（安装后自动生成）
+├── .ai-kb -> ~/          ← 软链接（运行 setup-ai 后生成）
 └── src/
 ```
 
@@ -101,7 +101,7 @@ project/
 {
   "scripts": {
     "setup-ai": "node scripts/setup-ai-kb.js",
-    "refresh-ai": "chezmoi update && chezmoi apply && node scripts/setup-ai-kb.js" // 刷新知识库
+    "refresh-ai": "chezmoi update && chezmoi apply && npm run setup-ai" // 刷新知识库
   }
 }
 ```
@@ -209,11 +209,11 @@ console.log('\n🎉 ai-kb 设置完成！');
 
 ### 手动备用方案
 
-如果 postinstall 没有触发，可以手动运行：
+如果 `setup-ai` 命令未正常运行，可以手动运行：
 
 ```bash
 # 方案一：使用 setup 脚本
-npm run setup
+npm run setup-ai
 
 # 方案二：手动创建软链接
 ln -s ~/.ai-kb .ai-kb
@@ -232,8 +232,11 @@ git clone https://github.com/your-team/project.git
 # 2. 进入项目目录
 cd project
 
-# 3. 安装依赖（自动触发 postinstall，完成所有设置）
+# 3. 安装依赖
 npm install
+
+# 4. 如需使用 ai-kb，运行 setup-ai 命令
+npm run setup-ai
 
 # 验证安装
 ls -la .ai-kb
@@ -241,7 +244,7 @@ ls -la .ai-kb
 # lrwxr-xr--  1 user  staff  18 ... .ai-kb -> /Users/user/.ai-kb
 ```
 
-安装完成后会自动完成：
+setup-ai 命令会完成：
 - 检查/安装 chezmoi
 - 检查/初始化 ai-kb
 - 创建软链接 `.ai-kb`
@@ -413,20 +416,11 @@ ai-kb/
 
 ## 常见问题
 
-### Q1: pnpm install 后没有自动设置 ai-kb
+### Q1: 运行 npm install 后没有设置 ai-kb
 
-检查 package.json：
-```json
-{
-  "scripts": {
-    "postinstall": "node scripts/setup-ai-kb.js"
-  }
-}
-```
-
-手动运行：
+ai-kb 不会在安装依赖时自动设置，如需使用请手动运行：
 ```bash
-node scripts/setup-ai-kb.js
+npm run setup-ai
 ```
 
 ### Q2: chezmoi 安装失败
@@ -463,8 +457,8 @@ chezmoi apply
 # 如果已存在同名目录，先删除
 rm -rf .ai-kb
 
-# 重新运行脚本
-node scripts/setup-ai-kb.js
+# 重新运行 setup-ai
+npm run setup-ai
 
 # 或手动创建
 ln -s ~/.ai-kb .ai-kb
@@ -526,17 +520,6 @@ chezmoi apply
 ---
 
 ## 团队协作
-
-### postinstall 脚本
-
-在 package.json 中添加：
-```json
-{
-  "scripts": {
-    "postinstall": "node scripts/setup-ai-kb.js"
-  }
-}
-```
 
 ### 团队成员协作更新
 
