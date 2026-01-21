@@ -116,26 +116,11 @@ const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
-// 加载 .env 文件（如果存在）
-const envPath = path.join(__dirname, '..', '.env');
-if (fs.existsSync(envPath)) {
-  require('dotenv').config({ path: envPath });
-}
-
-const { HOME, NODE_ENV } = process.env || {};
+const { HOME } = process.env || {};
 const AI_KB_SOURCE = `${HOME}/.ai-kb`;
 const PROJECT_ROOT = path.join(__dirname, '..');
 const PROJECT_AI_KB = path.join(PROJECT_ROOT, '.ai-kb');
 const GIT_REPO = 'https://github.com/your-team/project.git'; // 项目git地址
-
-// 判断是否跳过
-const isDev = NODE_ENV === 'dev';
-console.log('NODE_ENV', NODE_ENV);
-
-if (!isDev) {
-  console.log('ℹ️  不是开发环境，跳过 ai-kb 设置');
-  process.exit(0);
-}
 
 console.log('🔧 ai-kb 设置中...\n');
 
