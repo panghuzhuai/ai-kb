@@ -1,0 +1,108 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2025-01-21",
+  "files": [
+    {
+      "path": "core/prompts/base.md",
+      "category": "core",
+      "tags": ["基础", "规范", "通用"],
+      "description": "通用开发基础规范"
+    },
+    {
+      "path": "core/prompts/review.md",
+      "category": "core",
+      "tags": ["审查", "代码检查"],
+      "description": "代码审查检查清单"
+    },
+    {
+      "path": "core/templates/page.md",
+      "category": "core",
+      "tags": ["页面", "模板"],
+      "description": "页面开发通用模板"
+    },
+    {
+      "path": "core/templates/hook.md",
+      "category": "core",
+      "tags": ["Hook", "模板"],
+      "description": "自定义 Hook 开发模板"
+    },
+    {
+      "path": "domains/frontend/prompts/react-antd.md",
+      "category": "frontend",
+      "tags": ["React", "Antd", "前端"],
+      "description": "React + Antd5 开发规范"
+    },
+    {
+      "path": "domains/frontend/templates/component.md",
+      "category": "frontend",
+      "tags": ["组件", "模板"],
+      "description": "React 组件开发模板"
+    },
+    {
+      "path": "domains/backend/prompts/nodejs.md",
+      "category": "backend",
+      "tags": ["Node.js", "后端"],
+      "description": "Node.js 后端开发规范"
+    },
+    {
+      "path": "domains/backend/templates/api.md",
+      "category": "backend",
+      "tags": ["API", "模板"],
+      "description": "后端 API 开发模板"
+    },
+    {
+      "path": "domains/pm/prompts/prd.md",
+      "category": "pm",
+      "tags": ["PRD", "需求"],
+      "description": "PRD 需求文档模板"
+    },
+    {
+      "path": "domains/office/prompts/ppt.md",
+      "category": "office",
+      "tags": ["PPT", "演示"],
+      "description": "PPT 大纲模板"
+    },
+    {
+      "path": "shared/snippets/git.md",
+      "category": "shared",
+      "tags": ["Git", "代码片段"],
+      "description": "Git 常用命令片段"
+    },
+    {
+      "path": "shared/snippets/bash.md",
+      "category": "shared",
+      "tags": ["Bash", "代码片段"],
+      "description": "Bash 常用命令片段"
+    },
+    {
+      "path": "shared/guides/how-to-ask-ai.md",
+      "category": "shared",
+      "tags": ["提问", "指南"],
+      "description": "如何向 AI 提问指南"
+    },
+    {
+      "path": "shared/guides/troubleshooting.md",
+      "category": "shared",
+      "tags": ["排查", "问题"],
+      "description": "常见问题排查指南"
+    },
+    {
+      "path": "shared/guides/structure.md",
+      "category": "shared",
+      "tags": ["笔记", "结构"],
+      "description": "项目笔记结构规范"
+    },
+    {
+      "path": "core/what-went-well.md",
+      "category": "core",
+      "tags": ["反思", "总结"],
+      "description": "做得好的地方记录"
+    },
+    {
+      "path": "core/improvements.md",
+      "category": "core",
+      "tags": ["反思", "改进"],
+      "description": "待改进之处记录"
+    }
+  ]
+}

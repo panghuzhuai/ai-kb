@@ -1,0 +1,25 @@
+{
+  "version": "1.0.0",
+  "name": "ai-kb",
+  "description": "个人 AI 编程知识库",
+  "author": "panghuzhuai",
+  "lastUpdated": "2025-01-21",
+  "config": {
+    "searchEnabled": true,
+    "autoSync": false,
+    "syncInterval": 86400
+  },
+  "structure": {
+    "core": "核心文件，频繁使用",
+    "domains": "按工作领域分类",
+    "shared": "共享资源",
+    "projects": "项目特定配置",
+    "archive": "归档内容"
+  },
+  "domains": [
+    "frontend",
+    "backend",
+    "pm",
+    "office"
+  ]
+}
