@@ -102,6 +102,7 @@ project/
   "scripts": {
     "postinstall": "node scripts/setup-ai-kb.js",
     "setup": "node scripts/setup-ai-kb.js",
+    "refresh-kb": "chezmoi update && chezmoi apply && node scripts/setup-ai-kb.js" // 刷新知识库
   }
 }
 ```
@@ -115,17 +116,39 @@ const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
-const HOME = process.env.HOME;
+// 加载 .env 文件（如果存在）
+const envPath = path.join(__dirname, '..', '.env');
+if (fs.existsSync(envPath)) {
+  require('dotenv').config({ path: envPath });
+}
+
+const { HOME, NODE_ENV } = process.env || {};
 const AI_KB_SOURCE = `${HOME}/.ai-kb`;
 const PROJECT_ROOT = path.join(__dirname, '..');
 const PROJECT_AI_KB = path.join(PROJECT_ROOT, '.ai-kb');
-const GITHUB_REPO = 'https://github.com/你的团队/ai-kb.git';
+const GIT_REPO = 'https://github.com/your-team/project.git'; // 项目git地址
+
+// 判断是否跳过
+const isDev = NODE_ENV === 'dev';
+console.log('NODE_ENV', NODE_ENV);
+
+if (!isDev) {
+  console.log('ℹ️  不是开发环境，跳过 ai-kb 设置');
+  process.exit(0);
+}
 
 console.log('🔧 ai-kb 设置中...\n');
 
-// 1. 检查 chezmoi
-if (!execSync('which chezmoi 2>/dev/null', { encoding: 'utf-8' }).trim()) {
-  console.log('📦 正在安装 chezmoi...');
+// 1. 检查 chezmoi 是否存在
+let chezmoiExists = false;
+try {
+  chezmoiExists = execSync('which chezmoi', { encoding: 'utf-8' }).trim().length > 0;
+} catch {
+  chezmoiExists = false;
+}
+
+if (!chezmoiExists) {
+  console.log('📦 chezmoi 未安装，正在安装...');
   try {
     execSync('brew install chezmoi', { stdio: 'inherit' });
   } catch {
@@ -136,25 +159,63 @@ if (!execSync('which chezmoi 2>/dev/null', { encoding: 'utf-8' }).trim()) {
 }
 console.log('✅ chezmoi 已安装');
 
+// 辅助函数：递归复制文件
+function copyRecursiveSync(src, dest) {
+  if (fs.statSync(src).isDirectory()) {
+    fs.mkdirSync(dest, { recursive: true });
+    const children = fs.readdirSync(src);
+    for (const child of children) {
+      copyRecursiveSync(path.join(src, child), path.join(dest, child));
+    }
+  } else {
+    fs.copyFileSync(src, dest);
+  }
+}
+
 // 2. 检查/初始化 ai-kb
+const chezmoiRoot = path.join(process.env.HOME, '.local', 'share', 'chezmoi');
 if (!fs.existsSync(AI_KB_SOURCE)) {
   console.log('📥 正在初始化 ai-kb...');
   try {
-    execSync(`chezmoi init ${GITHUB_REPO}`, { stdio: 'inherit' });
-    execSync('chezmoi apply', { stdio: 'inherit' });
+    execSync(`chezmoi init ${GIT_REPO}`, { stdio: 'inherit' });
   } catch {
-    console.error('❌ ai-kb 初始化失败');
+    console.error('❌ chezmoi init 失败');
     process.exit(1);
   }
+}
+
+// 同步 chezmoi 仓库内容到 ai-kb
+console.log('🔄 正在同步知识库内容...');
+try {
+  execSync('chezmoi apply', { stdio: 'inherit' });
+
+  // 创建目标目录
+  fs.mkdirSync(AI_KB_SOURCE, { recursive: true });
+
+  // 复制 chezmoi 仓库中的所有内容（排除 .git）
+  const ignoreDirs = ['.git'];
+  const chezmoiItems = fs.readdirSync(chezmoiRoot);
+  for (const item of chezmoiItems) {
+    if (ignoreDirs.includes(item)) continue;
+    const src = path.join(chezmoiRoot, item);
+    const dest = path.join(AI_KB_SOURCE, item);
+    copyRecursiveSync(src, dest);
+  }
+} catch {
+  console.error('❌ 同步失败');
+  process.exit(1);
 }
 console.log('✅ ai-kb 已就绪');
 
 // 3. 创建软链接
-if (!fs.existsSync(PROJECT_AI_KB)) {
+const projectSymlinkExists = fs.existsSync(PROJECT_AI_KB);
+const projectIsSymlink = projectSymlinkExists && fs.lstatSync(PROJECT_AI_KB).isSymbolicLink();
+
+if (projectIsSymlink) {
+  console.log('✅ 软链接已存在');
+} else if (!projectSymlinkExists) {
   fs.symlinkSync(AI_KB_SOURCE, PROJECT_AI_KB);
   console.log(`🔗 软链接已创建: .ai-kb → ${AI_KB_SOURCE}`);
-} else if (fs.lstatSync(PROJECT_AI_KB).isSymbolicLink()) {
-  console.log('✅ 软链接已存在');
 } else {
   console.log('⚠️  已存在同名目录，请手动删除 .ai-kb 后重试');
 }
