@@ -100,9 +100,8 @@ project/
 ```json
 {
   "scripts": {
-    "postinstall": "node scripts/setup-ai-kb.js",
-    "setup": "node scripts/setup-ai-kb.js",
-    "refresh-kb": "chezmoi update && chezmoi apply && node scripts/setup-ai-kb.js" // 刷新知识库
+    "setup-ai": "node scripts/setup-ai-kb.js",
+    "refresh-ai": "chezmoi update && chezmoi apply && node scripts/setup-ai-kb.js" // 刷新知识库
   }
 }
 ```
